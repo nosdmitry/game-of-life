@@ -3,10 +3,18 @@
       <div class="pannel">
         <div class="pannel__item">
           <!-- <p class="text">Field border type</p> -->
-          <label>
-            <input v-model="activeBorders" type="checkbox" name="fieledBorder" />
-            turn off borders
+          <label class="control-wrap">
+            <input v-model="activeBorders" type="checkbox" name="fieledBorder" class="checkbox" />
+            <p class="control-text">turn off borders</p>
           </label>
+
+          <div class="speed-wrap">
+            <p class="control-text">life cycle speed: {{ speed  }} ms</p>
+            <div>
+              <button @click="speed = speed + 100">slower</button>
+              <button @click="speed = speed - 100">faster</button>
+            </div>
+          </div>
         </div>
         <button class="button" @click="handleSimulation">{{ simulationStarted ? 'pause' : 'start simulation'}}</button>
       </div>
@@ -35,6 +43,7 @@ export default {
   data() {
     return {
       simulationStarted: false,
+      speed: 600,
       mount: 50,
       activeBorders: true,
       world: {
@@ -73,22 +82,18 @@ export default {
     },
 
     checkCellStatus(rowId, cellId) {
-      
-      // console.log('**************************');
-      // console.log(`watch cell ${rowId}-${cellId}`);
+
       let aliveCounter = 0;
 
       let rowCounter = -1;
       while (rowCounter <= 1) {
 
         if(this.world.rows[rowId + rowCounter]) {
-
           let cellCounter = -1;
           while(cellCounter <= 1) {
-            
+
             if(this.world.rows[rowId + rowCounter].cells[cellId + cellCounter]) {
               if(this.world.rows[rowId + rowCounter].cells[cellId + cellCounter].isAlive) {
-                // console.log('counters ', rowCounter, cellCounter)
                 if ( rowCounter === 0 && cellCounter === 0) {
                   aliveCounter--;
                 }
@@ -98,7 +103,6 @@ export default {
             cellCounter++;
           }
         }
-        
         rowCounter++;
       }
 
@@ -120,7 +124,7 @@ export default {
         clearInterval(this.simulationStarted);
         this.simulationStarted = false;
       } else {
-        this.simulationStarted  = setInterval(this.makeSimulation, 300);
+        this.simulationStarted  = setInterval(this.makeSimulation, this.speed);
       }
 
       
@@ -216,5 +220,48 @@ export default {
   margin: 0;
   padding: 0;
 }
+
+.pannel {
+  border: 1px solid rgb(209 209 209 / 71%);
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  row-gap: 40px;
+}
+
+.pannel__item {
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+
+}
+
+.control-wrap {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.control-text {
+  padding: 0;
+  margin: 0;
+}
+
+.checkbox:checked + .checkbox-visual::before {
+  left: 20px;
+}
+
+
+.speed-wrap {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
 
 </style>
