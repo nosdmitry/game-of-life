@@ -4,19 +4,27 @@
         <div class="pannel__item">
           <!-- <p class="text">Field border type</p> -->
           <label class="control-wrap">
-            <input v-model="activeBorders" type="checkbox" name="fieledBorder" class="checkbox" />
+            <input v-model="activeBorders" disabled type="checkbox" name="fieledBorder" class="checkbox" />
             <p class="control-text">turn off borders</p>
           </label>
 
           <div class="speed-wrap">
             <p class="control-text">life cycle speed: {{ speed  }} ms</p>
             <div>
-              <button @click="speed = speed + 100">slower</button>
-              <button @click="speed = speed - 100">faster</button>
+              <button :disabled="simulationStarted || speed === 1200" @click="speed = speed + 100">slower</button>
+              <button :disabled="simulationStarted || speed === 100" @click="speed = speed - 100">faster</button>
             </div>
           </div>
+
+          <p class="control-text">generation: {{ generation }}</p>
+
+          <button :disabled="simulationStarted" @click="refreshWorld" class="button annihilate">annihilate</button>
+
         </div>
-        <button class="button" @click="handleSimulation">{{ simulationStarted ? 'pause' : 'start simulation'}}</button>
+        <div class="buttons-wrap">
+          <button :disabled="simulationStarted" @click="makeOneGeneration" class="button button-long">make one generation</button>
+          <button class="button button-short" @click="handleSimulation">{{ simulationStarted ? 'pause' : 'start simulation'}}</button>
+        </div>
       </div>
       <div>
 
@@ -46,6 +54,7 @@ export default {
       speed: 600,
       mount: 50,
       activeBorders: true,
+      generation: 0,
       world: {
         rows: [],
       },
@@ -54,28 +63,36 @@ export default {
   },
 
   mounted() {
-    const totalCounter = this.mount;
-    let i = 0;
-
-    function generateCells() {
-      let j = 0;
-      const cells = [];
-      while(j < totalCounter) {
-        cells.push({ id: j, isAlive: false });
-        j++;
-      }
-      return { id: i, cells,}      
-    }
-
-    while(i < totalCounter) {
-      this.world.rows.push(generateCells());
-      i++;
-    }
-
-    console.log(this.world)
+    this.generateWorld(this.mount);
   },
 
   methods: {
+
+    generateWorld(totalCounter) {
+      console.log('new world generated!')
+      let i = 0;
+      function generateCells() {
+        let j = 0;
+        const cells = [];
+        while(j < totalCounter) {
+          cells.push({ id: j, isAlive: false });
+          j++;
+        }
+        return { id: i, cells,}      
+      }
+      while(i < totalCounter) {
+        this.world.rows.push(generateCells());
+        i++;
+      }
+      console.log(this.world)
+    },
+
+    refreshWorld() {
+      this.world.rows = [];
+      this.generation = 0;
+      this.generateWorld(this.mount);
+    },
+
     handleLife(row, cell) {
       cell.isAlive = !cell.isAlive;
       this.activeCell = {row: row.id, cell: cell.id}
@@ -87,7 +104,7 @@ export default {
 
       let rowCounter = -1;
       while (rowCounter <= 1) {
-
+        
         if(this.world.rows[rowId + rowCounter]) {
           let cellCounter = -1;
           while(cellCounter <= 1) {
@@ -133,16 +150,16 @@ export default {
     },
     
     makeSimulation() {
-      this.world.rows.forEach((row, rowIndex) => {
+      this.generation++;
+      this.world.rows.forEach(row => {
         row.cells.forEach(cell => {
-          // if(cell.isAlive) {
-          //   console.log(`clicked cell: ${row.id}-${cell.id}`)
-          // }
-
           this.checkCellStatus(row.id, cell.id)
-
         })
       })
+    },
+
+    makeOneGeneration() {
+      this.makeSimulation();
     }
   },
 }
@@ -226,7 +243,7 @@ export default {
   padding: 10px;
   box-sizing: border-box;
   display: flex;
-  row-gap: 40px;
+
 }
 
 .pannel__item {
@@ -235,6 +252,10 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
+
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgb(209 209 209 / 71%);
 
 }
 
@@ -261,6 +282,25 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 10px;
+}
+
+.annihilate {
+  max-width: 60%;
+}
+
+.buttons-wrap {
+  display: flex;
+  column-gap: 10px;
+}
+
+.button-long {
+  max-width: 50%;
+  width: 100%;
+}
+
+.button-short {
+  max-width: 50%;
+  width: 100%;
 }
 
 
