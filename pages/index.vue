@@ -1,7 +1,12 @@
 <template>
-  <Tutorial/>
+  <section>
+    <field />
+  </section>
 </template>
 
 <script>
-export default {}
+import Field from '~/components/Field.vue'
+export default {
+  components: { Field, }
+}
 </script>
