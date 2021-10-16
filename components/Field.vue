@@ -1,29 +1,44 @@
 <template>
     <section class="content">
-      <div class="pannel">
-        <div class="pannel__item">
-          <!-- <p class="text">Field border type</p> -->
-          <label class="control-wrap">
-            <input v-model="activeBorders" disabled type="checkbox" name="fieledBorder" class="checkbox" />
-            <p class="control-text">turn off borders</p>
-          </label>
+      <div class="controll-wrap">
 
-          <div class="speed-wrap">
-            <p class="control-text">life cycle speed: {{ speed  }} ms</p>
-            <div>
-              <button :disabled="simulationStarted || speed === 1200" @click="speed = speed + 100">slower</button>
-              <button :disabled="simulationStarted || speed === 100" @click="speed = speed - 100">faster</button>
+      
+        <div class="pannel">
+          <div class="pannel__item">
+            <!-- <p class="text">Field border type</p> -->
+            <label class="control-wrap">
+              <input v-model="activeBorders" disabled type="checkbox" name="fieledBorder" class="checkbox" />
+              <p class="control-text">turn off borders</p>
+            </label>
+
+            <div class="speed-wrap">
+              <p class="control-text">life cycle speed: {{ speed  }} ms</p>
+              <div>
+                <button :disabled="simulationStarted || speed === 1200" @click="speed = speed + 100">slower</button>
+                <button :disabled="simulationStarted || speed === 100" @click="speed = speed - 100">faster</button>
+              </div>
             </div>
+
+            <p class="control-text">generation: {{ generation }}</p>
+
+            <button :disabled="simulationStarted" @click="refreshWorld" class="button annihilate">annihilate</button>
+
           </div>
-
-          <p class="control-text">generation: {{ generation }}</p>
-
-          <button :disabled="simulationStarted" @click="refreshWorld" class="button annihilate">annihilate</button>
-
+          <div class="buttons-wrap">
+            <button :disabled="simulationStarted" @click="makeOneGeneration" class="button button-long">make one generation</button>
+            <button class="button button-short" @click="handleSimulation">{{ simulationStarted ? 'pause' : 'start simulation'}}</button>
+          </div>
         </div>
-        <div class="buttons-wrap">
-          <button :disabled="simulationStarted" @click="makeOneGeneration" class="button button-long">make one generation</button>
-          <button class="button button-short" @click="handleSimulation">{{ simulationStarted ? 'pause' : 'start simulation'}}</button>
+
+        <div class="pannel pannel_examples">
+          <span>object examples</span>
+          <div class="exaple-buttons-wrap">
+            <button @click="generateNewObject(objectsDB.planer)">planer</button>
+            <button @click="generateNewObject(objectsDB.clock)">clock</button>
+            <button @click="generateNewObject(objectsDB.blocks)">two blocks</button>
+            <button @click="generateNewObject(objectsDB.pulsar)">pulsar</button>
+            <button @click="generateNewObject(objectsDB.stick)">stick</button>
+          </div>
         </div>
       </div>
       <div>
@@ -43,6 +58,7 @@
 
 <script>
 
+import objectsDB from '@/utils/objectsDB';
 
 export default {
   name: 'Field',
@@ -55,6 +71,7 @@ export default {
       mount: 50,
       activeBorders: true,
       generation: 0,
+      objectsDB,
       world: {
         rows: [],
       },
@@ -67,6 +84,13 @@ export default {
   },
 
   methods: {
+
+    generateNewObject(objectName) {
+      objectName.forEach(item => {
+        const [row, cell] = item.split('-');
+        this.world.rows[row].cells[cell].isAlive = true;
+      })
+    },
 
     generateWorld(totalCounter) {
       console.log('new world generated!')
@@ -93,9 +117,23 @@ export default {
       this.generateWorld(this.mount);
     },
 
+    findAllAliveCells() {
+      const result = [];
+      this.world.rows.forEach(row => {
+        row.cells.forEach(cell => {
+          if (cell.isAlive === true) {
+            result.push(`${row.id}-${cell.id}`);
+          }
+        });
+      });
+      console.log(result);
+    },
+
     handleLife(row, cell) {
       cell.isAlive = !cell.isAlive;
       this.activeCell = {row: row.id, cell: cell.id}
+
+      this.findAllAliveCells();
     },
 
     checkCellStatus(rowId, cellId) {
@@ -176,6 +214,23 @@ export default {
   column-gap: 20px;
   max-width: min-content;
   
+}
+
+.controll-wrap {
+  display: flex;
+  flex-direction: column;
+  row-gap: 40px;
+}
+
+.pannel_examples {
+  row-gap: 30px;
+}
+
+.exaple-buttons-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 10px;
 }
 
 .pannel {
