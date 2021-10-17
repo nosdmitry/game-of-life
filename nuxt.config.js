@@ -36,12 +36,12 @@ export default {
   modules: [
   ],
 
-  build: {
-    publicPath: '/static/',
-  },
+  // build: {
+  //   publicPath: '/static/',
+  // },
 
   router: {
     // mode: 'hash',
-    base: '/',   
+    base: '/game-of-life/',   
   },
 }

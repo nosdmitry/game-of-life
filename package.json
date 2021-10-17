@@ -2,6 +2,7 @@
   "name": "life",
   "version": "1.0.0",
   "private": true,
+  "homepage": ".",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -29,6 +30,7 @@
     "eslint-plugin-vue": "^7.12.1",
     "jest": "^27.0.5",
     "prettier": "^2.3.2",
+    "push-dir": "^0.4.1",
     "vue-jest": "^3.0.4"
   }
 }
